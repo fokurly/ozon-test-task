@@ -13,12 +13,17 @@ const (
 	DB_NAME     = "postgres"
 )
 
+const (
+	PORT = 5432
+	HOST = "database"
+)
+
 type PostgresStorage struct {
 	db *sql.DB
 }
 
 func NewPostgresStorage() *PostgresStorage {
-	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", DB_USER, DB_PASSWORD, DB_NAME)
+	dbinfo := fmt.Sprintf("host=%s, port=%d, user=%s password=%s dbname=%s sslmode=disable", HOST, PORT, DB_USER, DB_PASSWORD, DB_NAME)
 	db, err := sql.Open("postgres", dbinfo)
 	if err != nil {
 		panic(err)
