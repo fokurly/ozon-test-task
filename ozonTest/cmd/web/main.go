@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/spf13/viper"
 	"log"
 	"net/http"
 	interfacee "ozonTest/pkg/storage/interface"
@@ -14,11 +13,15 @@ import (
 
 var Storage interfacee.Storage
 
+const (
+	port = ":4000"
+)
+
 func main() {
 
-	if err := initConfig(); err != nil {
-		log.Fatalf("error initializing config: %s", err.Error())
-	}
+	//if err := initConfig(); err != nil {
+	//	log.Fatalf("error initializing config: %s", err.Error())
+	//}
 
 	var postgres bool
 	flag.BoolVar(&postgres, "postgres", true, "Choose db. True-postgres, false - local")
@@ -36,13 +39,14 @@ func main() {
 	route.HandleFunc("/getLongLink", getLongLink).Methods("GET")
 
 	log.Println("Запуск сервера на http://localhost:4000")
-	err := http.ListenAndServe(":"+viper.GetString("port"), route)
+	err := http.ListenAndServe(port, route)
+	//	err := http.ListenAndServe(":"+viper.GetString("port"), route)
 	fmt.Println(http.LocalAddrContextKey)
 	log.Fatal(err)
 }
 
-func initConfig() error {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
-}
+//func initConfig() error {
+//	viper.AddConfigPath("configs")
+//	viper.SetConfigName("config")
+//	return viper.ReadInConfig()
+//}

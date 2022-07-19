@@ -7,27 +7,33 @@ import (
 	"ozonTest/pkg/models"
 )
 
-const (
-	DB_USER     = "postgres"
-	DB_PASSWORD = "qweryGood"
-	DB_NAME     = "postgres"
-)
-
-const (
-	PORT = 5432
-	HOST = "database"
-)
+//const (
+//	DB_USER     = "user"
+//	DB_PASSWORD = "melissa123"
+//	DB_NAME     = "postgres"
+//	PORT        = 5432
+//	HOST        = "db"
+//)
 
 type PostgresStorage struct {
 	db *sql.DB
 }
 
 func NewPostgresStorage() *PostgresStorage {
-	dbinfo := fmt.Sprintf("host=%s, port=%d, user=%s password=%s dbname=%s sslmode=disable", HOST, PORT, DB_USER, DB_PASSWORD, DB_NAME)
+	dbinfo := "postgres://postgres:postgres@db:5432/postgres?sslmode=disable"
+	//dbinfo := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", DB_USER, DB_PASSWORD, HOST, PORT, DB_NAME)
+	fmt.Println(dbinfo)
 	db, err := sql.Open("postgres", dbinfo)
+
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
+
+	err = db.Ping()
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	return &PostgresStorage{db: db}
 }
 
@@ -36,7 +42,7 @@ func (storage *PostgresStorage) CreateShortLink(link models.Link) (string, error
 	defer db.Close()
 
 	var lastInsertID int
-	err := db.QueryRow("INSERT INTO linksDB(long_link, short_link) VALUES($1, $2);", link.Long, link.Short).Scan(&lastInsertID)
+	err := db.QueryRow("INSERT INTO linksdb(long_url, short_url) VALUES($1, $2);", link.Long, link.Short).Scan(&lastInsertID)
 
 	fmt.Println(lastInsertID)
 	if err == nil {
@@ -48,9 +54,8 @@ func (storage *PostgresStorage) CreateShortLink(link models.Link) (string, error
 
 func (storage *PostgresStorage) GetLongLink(short string) (string, error) {
 	db := setupDB()
-	defer db.Close()
 
-	query := fmt.Sprintf(`select * from linksDB where short_link='%s'`, short)
+	query := fmt.Sprintf(`select * from linksDB where short_url='%s'`, short)
 	rows, err := db.Query(query)
 
 	if err != nil {
@@ -71,7 +76,7 @@ func (storage *PostgresStorage) GetLongLink(short string) (string, error) {
 }
 
 func setupDB() *sql.DB {
-	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", DB_USER, DB_PASSWORD, DB_NAME)
+	dbinfo := fmt.Sprintf("postgres://postgres:postgres@db:5432/postgres?sslmode=disable")
 	db, err := sql.Open("postgres", dbinfo)
 
 	if err != nil {

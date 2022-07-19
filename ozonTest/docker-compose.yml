@@ -2,20 +2,29 @@ version: '3.8'
 
 services:
   ozon-test-task:
-    build: ..
-    command: ./wait-for-postgres.sh db ./ozon-test-task
+    build: ./
+    command: ./ozon -postgres=false
     ports:
-      - 8000:8000
+      - "4000:4000"
+
+  ozon-test-task-db:
+    build: ./
+    command: ./wait-for-postgres.sh db ./ozon -postgres=true
+    ports:
+      - "4000:4000"
     depends_on:
       - db
     environment:
-      - DB_PASSWORD=qweryGood
+      DB_PASSWORD: postgres
   db:
     restart: always
-    image: postgres:latest
+    image: postgres:14.4-alpine
     volumes:
-      - ./.database/postgres/data:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./schema/create_table.sql:/docker-entrypoint-initdb.d/create_table.sql
     environment:
-      - POSTGRES_PASSWORD=qweryGood
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     ports:
-      - 5436:5432
+      - "5432:5432"
