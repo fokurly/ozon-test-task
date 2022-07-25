@@ -1,15 +1,15 @@
 version: '3.8'
 
 services:
-  ozon-test-task:
+  url-shortener:
     build: ./
-    command: ./ozon -postgres=false
+    command: ./app -postgres=false
     ports:
       - "4000:4000"
 
-  ozon-test-task-db:
+  url-shortener-db:
     build: ./
-    command: ./wait-for-postgres.sh db ./ozon -postgres=true
+    command: ./wait-for-postgres.sh db ./app -postgres=true
     ports:
       - "4000:4000"
     depends_on:

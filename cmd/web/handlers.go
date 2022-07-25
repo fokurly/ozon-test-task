@@ -7,7 +7,6 @@ import (
 	"ozonTest/pkg/models"
 )
 
-// На каждую страницу сделать ограничение на методы запросов (get, post, put и тд)
 func createShortLink(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)

@@ -17,7 +17,6 @@ func NewLocalStorage() *LocalStorage {
 }
 
 func (storage LocalStorage) CreateShortLink(link models.Link) (string, error) {
-	fmt.Println("Защли")
 	if _, ok := storage.Short[link.Long]; ok {
 		return storage.Short[link.Long], nil
 	}
@@ -45,5 +44,5 @@ func (storage LocalStorage) GetLongLink(short string) (string, error) {
 		return storage.Long[short], nil
 	}
 
-	return "", fmt.Errorf("для заданной короткой ссылки не существует длинной")
+	return "", fmt.Errorf("there is no long link for current short")
 }

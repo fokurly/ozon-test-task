@@ -7,14 +7,6 @@ import (
 	"ozonTest/pkg/models"
 )
 
-//const (
-//	DB_USER     = "user"
-//	DB_PASSWORD = "melissa123"
-//	DB_NAME     = "postgres"
-//	PORT        = 5432
-//	HOST        = "db"
-//)
-
 type PostgresStorage struct {
 	db *sql.DB
 }
@@ -31,7 +23,7 @@ func NewPostgresStorage() *PostgresStorage {
 
 	err = db.Ping()
 	if err != nil {
-		fmt.Println(err)
+		panic(err)
 	}
 
 	return &PostgresStorage{db: db}
@@ -39,14 +31,10 @@ func NewPostgresStorage() *PostgresStorage {
 
 func (storage *PostgresStorage) CreateShortLink(link models.Link) (string, error) {
 	db := setupDB()
-	defer db.Close()
 
-	var lastInsertID int
-	err := db.QueryRow("INSERT INTO linksdb(long_url, short_url) VALUES($1, $2);", link.Long, link.Short).Scan(&lastInsertID)
-
-	fmt.Println(lastInsertID)
-	if err == nil {
-		return "", fmt.Errorf("что-то пошло не так при занесении новой ссылки в postgres")
+	_, err := db.Exec("INSERT INTO linksdb(long_url, short_url) VALUES($1, $2);", link.Long, link.Short)
+	if err != nil {
+		return "", err
 	}
 
 	return link.Short, nil
@@ -72,7 +60,7 @@ func (storage *PostgresStorage) GetLongLink(short string) (string, error) {
 		return long, nil
 	}
 
-	return "", fmt.Errorf("для заданной короткой ссылки нет длинной")
+	return "", fmt.Errorf("there is no long link for current short")
 }
 
 func setupDB() *sql.DB {

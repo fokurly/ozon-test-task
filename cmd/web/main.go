@@ -40,7 +40,7 @@ func main() {
 
 	log.Println("Запуск сервера на http://localhost:4000")
 	err := http.ListenAndServe(port, route)
-	//	err := http.ListenAndServe(":"+viper.GetString("port"), route)
+
 	fmt.Println(http.LocalAddrContextKey)
 	log.Fatal(err)
 }
