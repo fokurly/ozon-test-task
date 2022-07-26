@@ -6,7 +6,7 @@ There are two methods <br/>
 1) POST - creates a new record in service for current long link
 2) GET - returns  long link for current short
 
-Example of usage:
+Example of usage:<br/>
 ##POST
 Input the following json in the POST request body (http://localhost:4000/create)
 ```json
@@ -20,6 +20,7 @@ Service will generate a short token and return next json:
 {"shortLink":"a4VqvURlab","longLink":"https://yandex.ru/"}
 ```
 "shortLink" is the key to get our long link "https://yandex.ru/"
+<br/>
 
 ##GET
 Now we are going to get out long link.
