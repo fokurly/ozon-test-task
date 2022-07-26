@@ -36,5 +36,5 @@ The answer will be:
 {"shortLink":"a4VqvURlab","longLink":"https://yandex.ru/"}
 ```
 
-##Non-existent links
+## Non-existent links
 If you try to get non-existent link then service will just return `there is no long link for current short`
