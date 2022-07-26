@@ -7,7 +7,7 @@ There are two methods <br/>
 2) GET - returns  long link for current short
 
 Example of usage:<br/>
-##POST
+## POST
 Input the following json in the POST request body (http://localhost:4000/create)
 ```json
 {
@@ -22,7 +22,7 @@ Service will generate a short token and return next json:
 "shortLink" is the key to get our long link "https://yandex.ru/"
 <br/>
 
-##GET
+## GET
 Now we are going to get out long link.
 Input the following json in the GET request body (http://localhost:4000/getLongLink)
 ```json
