@@ -11,9 +11,8 @@ type PostgresStorage struct {
 	db *sql.DB
 }
 
-func NewPostgresStorage() *PostgresStorage {
-	dbinfo := "postgres://postgres:postgres@db:5432/postgres?sslmode=disable"
-	//dbinfo := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", DB_USER, DB_PASSWORD, HOST, PORT, DB_NAME)
+func NewPostgresStorage(user, password, host, port, dbName string) *PostgresStorage {
+	dbinfo := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", user, password, host, port, dbName)
 	fmt.Println(dbinfo)
 	db, err := sql.Open("postgres", dbinfo)
 
@@ -29,10 +28,9 @@ func NewPostgresStorage() *PostgresStorage {
 	return &PostgresStorage{db: db}
 }
 
-func (storage *PostgresStorage) CreateShortLink(link models.Link) (string, error) {
-	db := setupDB()
-
-	_, err := db.Exec("INSERT INTO linksdb(long_url, short_url) VALUES($1, $2);", link.Long, link.Short)
+func (s *PostgresStorage) CreateShortLink(link models.Link) (string, error) {
+	query := fmt.Sprintf("INSERT INTO linksdb(long_url, short_url) VALUES($1, $2);", link.Long, link.Short)
+	_, err := s.db.Exec(query)
 	if err != nil {
 		return "", err
 	}
@@ -40,16 +38,14 @@ func (storage *PostgresStorage) CreateShortLink(link models.Link) (string, error
 	return link.Short, nil
 }
 
-func (storage *PostgresStorage) GetLongLink(short string) (string, error) {
-	db := setupDB()
-
+func (s *PostgresStorage) GetLongLink(short string) (string, error) {
 	query := fmt.Sprintf(`select * from linksDB where short_url='%s'`, short)
-	rows, err := db.Query(query)
+	rows, err := s.db.Query(query)
+	defer rows.Close()
 
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer rows.Close()
 
 	for rows.Next() {
 		var id int
@@ -61,14 +57,4 @@ func (storage *PostgresStorage) GetLongLink(short string) (string, error) {
 	}
 
 	return "", fmt.Errorf("there is no long link for current short")
-}
-
-func setupDB() *sql.DB {
-	dbinfo := fmt.Sprintf("postgres://postgres:postgres@db:5432/postgres?sslmode=disable")
-	db, err := sql.Open("postgres", dbinfo)
-
-	if err != nil {
-		panic(err)
-	}
-	return db
 }

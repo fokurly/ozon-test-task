@@ -4,8 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
+	"os"
 	interfacee "ozonTest/pkg/storage/interface"
 	"ozonTest/pkg/storage/local"
 	"ozonTest/pkg/storage/postgresql"
@@ -17,12 +19,13 @@ const (
 	port = ":4000"
 )
 
+func init() {
+	if err := godotenv.Load(); err != nil {
+		log.Print("No .env file found")
+	}
+}
+
 func main() {
-
-	//if err := initConfig(); err != nil {
-	//	log.Fatalf("error initializing config: %s", err.Error())
-	//}
-
 	var postgres bool
 	flag.BoolVar(&postgres, "postgres", true, "Choose db. True-postgres, false - local")
 	flag.Parse()
@@ -30,7 +33,13 @@ func main() {
 	if !postgres {
 		Storage = local.NewLocalStorage()
 	} else {
-		Storage = postgresql.NewPostgresStorage()
+		user, _ := os.LookupEnv("POSTGRES_USER")
+		pass, _ := os.LookupEnv("POSTGRES_PASSWORD")
+		host, _ := os.LookupEnv("POSTGRES_HOST")
+		dbPort, _ := os.LookupEnv("POSTGRES_PORT")
+		dbName, _ := os.LookupEnv("POSTGRES_NAME")
+
+		Storage = postgresql.NewPostgresStorage(user, pass, host, dbPort, dbName)
 	}
 
 	route := mux.NewRouter()
@@ -44,9 +53,3 @@ func main() {
 	fmt.Println(http.LocalAddrContextKey)
 	log.Fatal(err)
 }
-
-//func initConfig() error {
-//	viper.AddConfigPath("configs")
-//	viper.SetConfigName("config")
-//	return viper.ReadInConfig()
-//}
